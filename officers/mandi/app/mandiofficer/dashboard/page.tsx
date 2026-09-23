@@ -2,10 +2,10 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { getSession, logout } from "../../lib/auth";
-import { generateSingleBillHtml } from '../../components/BillPrint';
+import { getSession, logout } from "../../../lib/auth";
+import { generateSingleBillHtml } from '../../../components/BillPrint';
 
-import { supabase } from "../../lib/supabaseClient";
+import { supabase } from "../../../lib/supabaseClient";
 import {
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer,
   PieChart, Pie, Cell
@@ -52,8 +52,8 @@ export default function DashboardPage() {
   const [totalTokens, setTotalTokens] = useState(0);
 
   useEffect(() => {
-    if (!getSession()) {
-      router.push('/');
+    if (!getSession('mandi')) {
+      router.push('/mandiofficer');
       return;
     }
     loadData();
@@ -198,8 +198,8 @@ export default function DashboardPage() {
   };
 
   const handleLogout = () => {
-    logout();
-    router.push('/');
+    logout('mandi');
+    router.push('/mandiofficer');
   };
 
   const saveFees = async (e: React.FormEvent) => {

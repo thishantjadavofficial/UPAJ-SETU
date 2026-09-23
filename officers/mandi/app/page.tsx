@@ -1,86 +1,44 @@
-"use client";
-
-import { useState, useEffect } from 'react';
+'use client';
 import { useRouter } from 'next/navigation';
-import { login, getSession, MOCK_USER } from '../lib/auth';
-import { ShieldCheck } from 'lucide-react';
+import { ShieldCheck, Scale, Landmark } from 'lucide-react';
 
-export default function LoginPage() {
+export default function OfficerPortalSelector() {
   const router = useRouter();
-  const [email, setEmail] = useState('mandi.officer.v2@mandi');
-  const [password, setPassword] = useState('Mandi@V2');
-  const [error, setError] = useState('');
-
-  useEffect(() => {
-    if (getSession()) {
-      router.push('/dashboard');
-    }
-  }, [router]);
-
-  const handleLogin = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (login(email, password)) {
-      router.push('/dashboard');
-    } else {
-      setError('Invalid credentials');
-    }
-  };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50 px-4">
-      <div className="max-w-md w-full bg-white rounded-xl shadow-lg p-8">
-        <div className="text-center mb-8">
-          <div className="mx-auto w-16 h-16 bg-primary-100 rounded-full flex items-center justify-center mb-4">
-            <ShieldCheck className="w-8 h-8 text-primary-600" />
-          </div>
-          <h1 className="text-2xl font-bold text-gray-900">Mandi Officer Portal</h1>
-          <p className="text-gray-500 mt-2">UPAJ SETU V2 APMC System</p>
-        </div>
+    <div className="min-h-screen bg-gray-50 flex flex-col items-center justify-center p-6">
+      <div className="text-center mb-10">
+        <h1 className="text-3xl font-bold text-gray-900 mb-2">UPAJ SETU V2</h1>
+        <p className="text-gray-500">APMC Unified Officers Portal</p>
+      </div>
 
-        {error && (
-          <div className="bg-red-50 text-red-600 p-3 rounded-lg mb-6 text-sm text-center">
-            {error}
+      <div className="w-full max-w-4xl grid grid-cols-1 md:grid-cols-3 gap-6">
+        {/* Gate Officer */}
+        <button onClick={() => router.push('/gateofficer')} className="bg-white p-8 rounded-2xl shadow-sm border border-gray-200 hover:shadow-md hover:border-blue-300 transition flex flex-col items-center text-center group">
+          <div className="w-16 h-16 bg-blue-50 text-blue-600 rounded-full flex items-center justify-center mb-4 group-hover:scale-110 transition">
+            <ShieldCheck className="w-8 h-8" />
           </div>
-        )}
+          <h2 className="text-xl font-bold text-gray-800 mb-2">Gate Officer</h2>
+          <p className="text-sm text-gray-500">Scan QR codes, verify farmer entry, and mark arrival.</p>
+        </button>
 
-        <form onSubmit={handleLogin} className="space-y-6">
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Email</label>
-            <input
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 outline-none transition"
-              placeholder="officer@mandi"
-              required
-            />
+        {/* Weight Officer */}
+        <button onClick={() => router.push('/weightofficer')} className="bg-white p-8 rounded-2xl shadow-sm border border-gray-200 hover:shadow-md hover:border-green-300 transition flex flex-col items-center text-center group">
+          <div className="w-16 h-16 bg-green-50 text-green-600 rounded-full flex items-center justify-center mb-4 group-hover:scale-110 transition">
+            <Scale className="w-8 h-8" />
           </div>
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Password</label>
-            <input
-              type="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 outline-none transition"
-              placeholder="â€¢â€¢â€¢â€¢â€¢â€¢â€¢â€¢"
-              required
-            />
-          </div>
-          <button
-            type="submit"
-            className="w-full bg-primary-600 hover:bg-primary-700 text-white font-medium py-2.5 rounded-lg transition"
-          >
-            Sign In
-          </button>
-        </form>
+          <h2 className="text-xl font-bold text-gray-800 mb-2">Weight Officer</h2>
+          <p className="text-sm text-gray-500">Record exact crop weights after auction.</p>
+        </button>
 
-        <div className="mt-8 pt-6 border-t border-gray-100">
-          <p className="text-sm text-gray-500 mb-2">Demo Credentials:</p>
-          <div className="bg-gray-50 p-3 rounded-lg text-sm font-mono text-gray-600">
-            <p>Email: {MOCK_USER.email}</p>
-            <p>Pass: {MOCK_USER.password}</p>
+        {/* Mandi Officer */}
+        <button onClick={() => router.push('/mandiofficer')} className="bg-white p-8 rounded-2xl shadow-sm border border-gray-200 hover:shadow-md hover:border-purple-300 transition flex flex-col items-center text-center group">
+          <div className="w-16 h-16 bg-purple-50 text-purple-600 rounded-full flex items-center justify-center mb-4 group-hover:scale-110 transition">
+            <Landmark className="w-8 h-8" />
           </div>
-        </div>
+          <h2 className="text-xl font-bold text-gray-800 mb-2">Mandi Officer</h2>
+          <p className="text-sm text-gray-500">Monitor APMC live feed, view bills, and manage fees.</p>
+        </button>
       </div>
     </div>
   );
