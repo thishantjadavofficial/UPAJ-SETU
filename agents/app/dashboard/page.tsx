@@ -302,7 +302,7 @@ function AuctionTab() {
                 )}
                 {lot.status === 'AUCTIONED' && (
                   <p className="mt-2 text-sm font-medium text-green-700 bg-green-50 px-3 py-1.5 rounded-lg inline-block">
-                    Done: Rs {lot.auction_rate}/q -> {veparis.find(v=>v.id===lot.vepari_id)?.company_name || 'Buyer'}
+                    Done: Rs {lot.auction_rate}/q -&gt; {veparis.find(v=>v.id===lot.vepari_id)?.company_name || 'Buyer'}
                   </p>
                 )}
               </div>

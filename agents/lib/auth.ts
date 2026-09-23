@@ -1,4 +1,4 @@
-export function login(email, password) {
+export function login(email: string, password: string) {
   if (email === 'agent.v2@mandi' && password === 'Agent@V2') {
     const user = { name: 'Agent V2', role: 'AGENT' };
     localStorage.setItem('session', JSON.stringify(user));
