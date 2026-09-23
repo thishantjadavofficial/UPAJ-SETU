@@ -1,0 +1,27 @@
+{
+  "name": "apmc-agent-v2",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev -p 3011",
+    "build": "next build",
+    "start": "next start -p 3011"
+  },
+  "dependencies": {
+    "@supabase/supabase-js": "^2.45.0",
+    "html5-qrcode": "^2.3.8",
+    "lucide-react": "^0.453.0",
+    "next": "14.2.15",
+    "react": "^18",
+    "react-dom": "^18"
+  },
+  "devDependencies": {
+    "@types/node": "^20",
+    "@types/react": "^18",
+    "@types/react-dom": "^18",
+    "autoprefixer": "^10.0.1",
+    "postcss": "^8",
+    "tailwindcss": "^3.4.1",
+    "typescript": "^5"
+  }
+}

@@ -1,0 +1,109 @@
+function HistoryTab() {
+  const [historyTokens, setHistoryTokens] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [fees, setFees] = useState<any>(null);
+
+  const loadHistory = async () => {
+    setLoading(true);
+    
+    const [tokensRes, feesRes] = await Promise.all([
+      supabase
+        .from('master_tokens')
+        .select('*, crop_sub_lots(*, veparis(*)), v2_bills(*)')
+        .order('created_at', { ascending: false })
+        .limit(100),
+      supabase.from('apmc_fees').select('*').eq('id', 1).single()
+    ]);
+
+    if (tokensRes.data) setHistoryTokens(tokensRes.data);
+    if (feesRes.data) setFees(feesRes.data);
+    
+    setLoading(false);
+  };
+
+  useEffect(() => { loadHistory(); }, []);
+
+  const viewBills = (token: any) => {
+    if (!fees) return alert('Fees loading...');
+    
+    let farmerGross = 0;
+    token.crop_sub_lots.forEach((lot: any) => { 
+      farmerGross += (lot.actual_weight || lot.estimated_weight) * (lot.auction_rate || 0); 
+    });
+
+    const unloadingAmt = farmerGross * fees.farmer_unloading_fee_percent / 100;
+    const commissionAmt = farmerGross * fees.agent_commission_percent / 100;
+    const farmerNet = farmerGross - unloadingAmt - commissionAmt;
+    const vepariNet = farmerGross + (farmerGross * fees.market_fee_percent / 100) + (farmerGross * fees.gst_percent / 100);
+    
+    const html = generateCombinedBillsHtml({
+      token_number: token.token_number,
+      farmer_name: token.farmer_name,
+      farmer_uid: token.farmer_uid,
+      lots: token.crop_sub_lots.map((l:any) => ({...l, vepari_name: l.veparis?.company_name, vepari_gst: l.veparis?.gst_number})),
+      fees,
+      gross_amount: farmerGross,
+      farmer_net: farmerNet,
+      vepari_net: vepariNet
+    });
+
+    const fWin = window.open('', '_blank');
+    fWin?.document.write(html); 
+    fWin?.document.close(); 
+  };
+
+  return (
+    <div>
+      <div className="flex justify-between items-center mb-4">
+        <h2 className="text-lg font-bold flex items-center gap-2"><History className="w-5 h-5 text-primary-600"/>Agent Ledger & History</h2>
+        <button onClick={loadHistory} className="flex items-center gap-1 text-sm bg-gray-100 hover:bg-gray-200 px-3 py-1.5 rounded-lg transition"><RefreshCw className="w-4 h-4"/>Refresh</button>
+      </div>
+      
+      {loading ? (
+        <div className="text-center py-12 text-gray-400">Loading...</div>
+      ) : historyTokens.length === 0 ? (
+        <div className="text-center py-12 text-gray-400 border-2 border-dashed rounded-xl">No history found.</div>
+      ) : (
+        <div className="space-y-4">
+          {historyTokens.map(token => (
+            <div key={token.id} className="bg-white rounded-xl p-5 shadow-sm border border-gray-200">
+              <div className="flex justify-between items-start mb-3 border-b pb-3">
+                <div>
+                  <div className="flex items-center gap-2">
+                    <h3 className="font-bold text-lg">{token.token_number}</h3>
+                    <span className={"px-2 py-0.5 rounded text-xs font-bold " + (token.status === 'BILLED' ? 'bg-green-100 text-green-700' : 'bg-blue-100 text-blue-700')}>{token.status}</span>
+                  </div>
+                  <p className="text-sm text-gray-600">Farmer: <span className="font-semibold">{token.farmer_name}</span> ({token.farmer_uid})</p>
+                  <p className="text-xs text-gray-400 mt-1">Created: {new Date(token.created_at).toLocaleString()}</p>
+                </div>
+                {token.status === 'BILLED' && (
+                  <button onClick={() => viewBills(token)} className="bg-primary-600 text-white hover:bg-primary-700 text-xs px-4 py-2 rounded-lg font-bold shadow-sm transition flex items-center gap-2">
+                    <Receipt className="w-4 h-4"/> View All Bills
+                  </button>
+                )}
+              </div>
+
+              <div className="space-y-2">
+                {token.crop_sub_lots?.map((lot: any) => (
+                  <div key={lot.id} className="flex justify-between items-center bg-gray-50 p-2.5 rounded-lg border border-gray-100">
+                    <div>
+                      <p className="font-bold text-gray-800 text-sm">{lot.crop_name} <span className="text-gray-400 font-normal text-xs">({lot.sub_id})</span></p>
+                      <p className="text-xs text-gray-600 mt-0.5">Buyer: <span className="font-semibold">{lot.veparis?.company_name || 'N/A'}</span></p>
+                    </div>
+                    <div className="text-right">
+                      <p className="font-bold text-gray-800 text-sm">Rs {lot.auction_rate || 0}/q</p>
+                      <p className="text-xs text-gray-500 mt-0.5">{lot.actual_weight || lot.estimated_weight} quintals</p>
+                    </div>
+                    <div className="text-right w-24">
+                      <span className="text-[10px] font-bold px-2 py-1 bg-white border rounded text-gray-600 uppercase">{lot.status}</span>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}

@@ -1,0 +1,17 @@
+{
+  "name": "upaj-setu-v2",
+  "version": "2.0.0",
+  "description": "APMC Smart Mandi V2 - Full Workflow Platform",
+  "private": true,
+  "scripts": {
+    "dev:farmer":  "npm run dev --prefix farmers",
+    "dev:agent":   "npm run dev --prefix agents",
+    "dev:gate":    "npm run dev --prefix officers/gate",
+    "dev:weight":  "npm run dev --prefix officers/weight",
+    "dev:mandi":   "npm run dev --prefix officers/mandi",
+    "dev:all": "concurrently \"npm run dev:farmer\" \"npm run dev:agent\" \"npm run dev:gate\" \"npm run dev:weight\" \"npm run dev:mandi\""
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.2"
+  }
+}
